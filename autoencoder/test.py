@@ -7,6 +7,7 @@ from torch.utils.data import DataLoader
 from tqdm import tqdm
 from dataset import Autoencoder_dataset
 from model import Autoencoder
+from runner_utils.runner_macros import *
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
@@ -28,10 +29,10 @@ if __name__ == '__main__':
     dataset_path = args.dataset_path
     encoder_hidden_dims = args.encoder_dims
     decoder_hidden_dims = args.decoder_dims
-    ckpt_path = f"ckpt/sofa/test/autoencoder_ckpt.pth"
+    ckpt_path = "LangSplat/ckpt/autoencoder_ckpt.pth"
 
-    data_dir = f"{dataset_path}/language_features"
-    output_dir = f"{dataset_path}/language_features_dim3"
+    data_dir = f"{DATA_SAMPLES_DIR}/{LANGSPLAT_DATASET_DIR}/{dataset_name}/language_features"
+    output_dir = f"{DATA_SAMPLES_DIR}/{LANGSPLAT_DATASET_DIR}/{dataset_name}/language_features_dim3"
 
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)

@@ -34,9 +34,11 @@ if __name__ == '__main__':
                     )
     parser.add_argument('--dataset_name', type=str, required=True)
     args = parser.parse_args()
+    args.output = "test"
     dataset_path = args.dataset_path
+    dataset_name = args.dataset_name
     num_epochs = args.num_epochs
-    data_dir = f"{dataset_path}/language_features"
+    data_dir = f"{dataset_path}/language_features_1080p"
     os.makedirs(f'ckpt/{args.dataset_name}', exist_ok=True)
     train_dataset = Autoencoder_dataset(data_dir)
     train_loader = DataLoader(
@@ -81,12 +83,7 @@ if __name__ == '__main__':
             loss.backward()
             optimizer.step()
 
-            global_iter = epoch * len(train_loader) + idx
-            tb_writer.add_scalar('train_loss/l2_loss', l2loss.item(), global_iter)
-            tb_writer.add_scalar('train_loss/cos_loss', cosloss.item(), global_iter)
-            tb_writer.add_scalar('train_loss/total_loss', loss.item(), global_iter)
-            tb_writer.add_histogram("feat", outputs, global_iter)
-
+        print(f"epoch: {epoch}, loss: {loss.item()}")
         if epoch > 95:
             eval_loss = 0.0
             model.eval()
@@ -97,13 +94,13 @@ if __name__ == '__main__':
                 loss = l2_loss(outputs, data) + cos_loss(outputs, data)
                 eval_loss += loss * len(feature)
             eval_loss = eval_loss / len(train_dataset)
-            print("eval_loss:{:.8f}".format(eval_loss))
+
             if eval_loss < best_eval_loss:
                 best_eval_loss = eval_loss
                 best_epoch = epoch
                 torch.save(model.state_dict(), f'ckpt/{dataset_name}/{args.output}/best_ckpt.pth')
                 
-            if epoch % 10 == 0:
+            if epoch % 5 == 0:
                 torch.save(model.state_dict(), f'ckpt/{dataset_name}/{args.output}/{epoch}_ckpt.pth')
             
     print(f"best_epoch: {best_epoch}")
