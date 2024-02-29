@@ -20,6 +20,7 @@ from utils.general_utils import safe_state
 from argparse import ArgumentParser
 from arguments import ModelParams, PipelineParams, get_combined_args
 from gaussian_renderer import GaussianModel
+from autoencoder.model import Autoencoder
 
 def render_set(model_path, source_path, name, iteration, views, gaussians, pipeline, background, args):
     render_path = os.path.join(model_path, name, "ours_{}".format(iteration), "renders")
@@ -39,7 +40,15 @@ def render_set(model_path, source_path, name, iteration, views, gaussians, pipel
             rendering = output["render"]
         else:
             rendering = output["language_feature_image"]
-            
+        
+
+        #autoencoder = Autoencoder([256, 128, 64, 32, 3], [16, 32, 64, 128, 256, 256, 512]).to("cuda:0")
+        #autoencoder.load_state_dict(torch.load("ckpt/sofa/test/autoencoder_ckpt.pth"))
+
+        #language_feature_image = output["language_feature_image"].permute(1, 2, 0)
+        # Initialize to empty tensor
+        #ori_language_feature_image = autoencoder.decode(language_feature_image).permute(2, 0, 1)
+        
         if not args.include_feature:
             gt = view.original_image[0:3, :, :]
             
@@ -63,10 +72,10 @@ def render_sets(dataset : ModelParams, iteration : int, pipeline : PipelineParam
         background = torch.tensor(bg_color, dtype=torch.float32, device="cuda")
 
         if not skip_train:
-             render_set(dataset.model_path, "train", scene.loaded_iter, scene.getTrainCameras(), gaussians, pipeline, background, args)
+             render_set(dataset.model_path, dataset.source_path, "train", scene.loaded_iter, scene.getTrainCameras(), gaussians, pipeline, background, args)
 
         if not skip_test:
-             render_set(dataset.model_path, "test", scene.loaded_iter, scene.getTestCameras(), gaussians, pipeline, background, args)
+             render_set(dataset.model_path, dataset.source_path, "test", scene.loaded_iter, scene.getTestCameras(), gaussians, pipeline, background, args)
 
 if __name__ == "__main__":
     # Set up command line argument parser
