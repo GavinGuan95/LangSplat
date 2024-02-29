@@ -64,7 +64,7 @@ def render_sets(dataset : ModelParams, iteration : int, pipeline : PipelineParam
     with torch.no_grad():
         gaussians = GaussianModel(dataset.sh_degree)
         scene = Scene(dataset, gaussians, shuffle=False)
-        checkpoint = os.path.join(args.model_path, 'chkpnt30000.pth')
+        checkpoint = os.path.join(args.model_path, 'chkpnt' + str(args.checkpoint_number) + '.pth')
         (model_params, first_iter) = torch.load(checkpoint)
         gaussians.restore(model_params, args, mode='test')
         
@@ -88,6 +88,7 @@ if __name__ == "__main__":
     parser.add_argument("--skip_test", action="store_true")
     parser.add_argument("--quiet", action="store_true")
     parser.add_argument("--include_feature", action="store_true")
+    parser.add_argument("--checkpoint_number", default=30000, type=int)
 
     args = get_combined_args(parser)
     print("Rendering " + args.model_path)
