@@ -7,6 +7,7 @@ from dataset import Autoencoder_dataset
 from model import Autoencoder
 from torch.utils.tensorboard import SummaryWriter
 import argparse
+from runner_utils.runner_macros import *
 
 torch.autograd.set_detect_anomaly(True)
 
@@ -38,8 +39,8 @@ if __name__ == '__main__':
     dataset_path = args.dataset_path
     dataset_name = args.dataset_name
     num_epochs = args.num_epochs
-    data_dir = f"{dataset_path}/language_features_1080p"
-    os.makedirs(f'ckpt/{args.dataset_name}', exist_ok=True)
+    data_dir = f"{dataset_path}/language_features"
+    #os.makedirs(f'ckpt/{args.dataset_name}', exist_ok=True)
     train_dataset = Autoencoder_dataset(data_dir)
     train_loader = DataLoader(
         dataset=train_dataset,
@@ -98,10 +99,8 @@ if __name__ == '__main__':
             if eval_loss < best_eval_loss:
                 best_eval_loss = eval_loss
                 best_epoch = epoch
-                torch.save(model.state_dict(), f'ckpt/{dataset_name}/{args.output}/best_ckpt.pth')
+                torch.save(model.state_dict(), f'{dataset_path}/{AUTOENCODER_MODEL}')
                 
-            if epoch % 5 == 0:
-                torch.save(model.state_dict(), f'ckpt/{dataset_name}/{args.output}/{epoch}_ckpt.pth')
             
     print(f"best_epoch: {best_epoch}")
     print("best_loss: {:.8f}".format(best_eval_loss))
