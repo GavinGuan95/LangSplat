@@ -106,7 +106,9 @@ class OpenCLIPNetwork(nn.Module):
         processed_input = self.process(input).half()
         return self.model.encode_image(processed_input)
 
-
+    # Used by Nerfret
+    def encode_text(self, text):
+        return self.model.encode_text(self.tokenizer(text).to("cuda"))
 
 
 
