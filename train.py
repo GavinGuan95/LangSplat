@@ -10,6 +10,7 @@
 #
 
 import os
+import numpy as np
 import torch
 from random import randint
 from utils.loss_utils import l1_loss, ssim
