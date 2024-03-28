@@ -29,7 +29,7 @@ if __name__ == '__main__':
     dataset_path = args.dataset_path
     encoder_hidden_dims = args.encoder_dims
     decoder_hidden_dims = args.decoder_dims
-    ckpt_path = os.path.join(dataset_path, AUTOENCODER_MODEL)
+    ckpt_path = os.path.join(dataset_path, LANGSPLAT_AUTOENCODER_MODEL)
 
     data_dir = f"{DATA_SAMPLES_DIR}/{LANGSPLAT_DATASET_DIR}/{dataset_name}/language_features"
     output_dir = f"{DATA_SAMPLES_DIR}/{LANGSPLAT_DATASET_DIR}/{dataset_name}/language_features_dim3"

@@ -97,8 +97,8 @@ if __name__ == '__main__':
             if eval_loss < best_eval_loss:
                 best_eval_loss = eval_loss
                 best_epoch = epoch
-                torch.save(model.state_dict(), f'{dataset_path}/{AUTOENCODER_MODEL}')
-                print(f"Saved model at epoch {epoch} to {dataset_path}/{AUTOENCODER_MODEL}")
+                torch.save(model.state_dict(), f'{dataset_path}/{LANGSPLAT_AUTOENCODER_MODEL}')
+                print(f"Saved model at epoch {epoch} to {dataset_path}/{LANGSPLAT_AUTOENCODER_MODEL}")
                 
             
     print(f"best_epoch: {best_epoch}")
