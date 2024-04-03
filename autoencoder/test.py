@@ -31,8 +31,8 @@ if __name__ == '__main__':
     decoder_hidden_dims = args.decoder_dims
     ckpt_path = os.path.join(dataset_path, LANGSPLAT_AUTOENCODER_MODEL)
 
-    data_dir = f"{DATA_SAMPLES_DIR}/{LANGSPLAT_DATASET_DIR}/{dataset_name}/language_features"
-    output_dir = f"{DATA_SAMPLES_DIR}/{LANGSPLAT_DATASET_DIR}/{dataset_name}/language_features_dim3"
+    data_dir = os.path.join(LANGSPLAT_DATASET_DIR, dataset_name, "language_features")
+    output_dir = os.path.join(LANGSPLAT_DATASET_DIR, dataset_name, "language_features_dim3")
 
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
