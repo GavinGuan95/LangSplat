@@ -13,6 +13,7 @@ from scene.cameras import Camera
 import numpy as np
 from utils.general_utils import PILtoTorch
 from utils.graphics_utils import fov2focal
+import torch
 
 WARNED = False
 
@@ -81,3 +82,25 @@ def camera_to_JSON(id, camera : Camera):
         'fx' : fov2focal(camera.FovX, camera.width)
     }
     return camera_entry
+
+def ns_cameras_to_langsplat_cameras(ns_cameras_list):
+    langsplat_cameras = []
+    for i, ns_camera in enumerate(ns_cameras_list):
+        width = ns_camera.image_width
+        height = ns_camera.image_height
+        c2w = torch.cat((ns_camera.camera_to_worlds, torch.tensor([[0, 0, 0, 1]]).to(ns_camera.camera_to_worlds)), dim=0).to("cpu").numpy()
+        c2w[:3, 1:3] *= -1
+        w2c = np.linalg.inv(c2w)
+        R = np.transpose(w2c[:3, :3])
+        T = w2c[:3, 3]
+        FoVx = ns_camera.fx
+        FoVy = ns_camera.fy
+        colmap_id = i
+        uid = i
+        langsplat_cameras.append(Camera(colmap_id, R, T, FoVx, FoVy, None, None, f"frame_{i}", uid, width=width, height=height))
+    return langsplat_cameras
+        
+
+        
+
+
