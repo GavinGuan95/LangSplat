@@ -85,7 +85,6 @@ def render_sets(dataset : ModelParams, iteration : int, pipeline : PipelineParam
     else:
         with torch.no_grad():
             gaussians = GaussianModel(dataset.sh_degree)
-            scene = Scene(dataset, gaussians, shuffle=False)
             checkpoint = os.path.join(args.model_path, 'chkpnt' + str(args.checkpoint_number) + '.pth')
             (model_params, first_iter) = torch.load(checkpoint)
             gaussians.restore(model_params, args, mode='test')
@@ -95,7 +94,7 @@ def render_sets(dataset : ModelParams, iteration : int, pipeline : PipelineParam
             camera_path_json = json.load(open(args.camera_path_file))
             ns_cameras = get_path_from_json(camera_path_json)
             views = ns_cameras_to_langsplat_cameras(ns_cameras)
-            render_set(dataset.model_path, dataset.source_path, "camera_path", scene.loaded_iter, views, gaussians, pipeline, background, args)
+            render_set(dataset.model_path, dataset.source_path, "camera_path", None, views, gaussians, pipeline, background, args)
 
 
 
