@@ -49,8 +49,8 @@ class ModelParams(ParamGroup):
         self.sh_degree = 3
         self._source_path = ""
         self._model_path = "" 
-        # self._language_features_name = "language_features_dim3"
-        self._language_features_name = "language_features"
+        self._language_features_name = "language_features_dim3"
+        # self._language_features_name = "language_features"
         self._images = "images"
         self._resolution = -1
         self._white_background = False
