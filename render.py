@@ -65,7 +65,7 @@ def render_set(model_path, source_path, name, iteration, views, gaussians, pipel
         if not args.ignore_gt:
             torchvision.utils.save_image(gt, os.path.join(gts_path, '{0:05d}'.format(idx) + ".png"))
                
-def render_sets(dataset : ModelParams, iteration : int, pipeline : PipelineParams, skip_train : bool, skip_test : bool, args):
+def render_sets(dataset : ModelParams, iteration : int, pipeline : PipelineParams, skip_train : bool, skip_test : bool, args, render_num_images=-1):
     if not args.render_camera_path:
         with torch.no_grad():
             gaussians = GaussianModel(dataset.sh_degree)
@@ -78,10 +78,10 @@ def render_sets(dataset : ModelParams, iteration : int, pipeline : PipelineParam
             background = torch.tensor(bg_color, dtype=torch.float32, device="cuda")
 
             if not skip_train:
-                render_set(dataset.model_path, dataset.source_path, "train", scene.loaded_iter, scene.getTrainCameras(), gaussians, pipeline, background, args)
+                render_set(dataset.model_path, dataset.source_path, "train", scene.loaded_iter, scene.getTrainCameras(render_num_images=render_num_images), gaussians, pipeline, background, args)
 
             if not skip_test:
-                render_set(dataset.model_path, dataset.source_path, "test", scene.loaded_iter, scene.getTestCameras(), gaussians, pipeline, background, args)
+                render_set(dataset.model_path, dataset.source_path, "test", scene.loaded_iter, scene.getTestCameras(render_num_images=render_num_images), gaussians, pipeline, background, args)
     else:
         with torch.no_grad():
             gaussians = GaussianModel(dataset.sh_degree)
@@ -113,6 +113,7 @@ if __name__ == "__main__":
     parser.add_argument("--render_camera_path", type=bool, default=False)
     parser.add_argument("--camera_path_file", type=str, default=None)
     parser.add_argument("--ignore_gt", type=bool, default=False)
+    parser.add_argument("--render_num_images", type=int, default=-1)
 
 
     args = get_combined_args(parser)
@@ -120,4 +121,4 @@ if __name__ == "__main__":
 
     safe_state(args.quiet)
 
-    render_sets(model.extract(args), args.iteration, pipeline.extract(args), args.skip_train, args.skip_test, args)
+    render_sets(model.extract(args), args.iteration, pipeline.extract(args), args.skip_train, args.skip_test, args, render_num_images=args.render_num_images)

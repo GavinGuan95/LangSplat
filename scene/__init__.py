@@ -87,8 +87,16 @@ class Scene:
         point_cloud_path = os.path.join(self.model_path, "point_cloud/iteration_{}".format(iteration))
         self.gaussians.save_ply(os.path.join(point_cloud_path, "point_cloud.ply"))
 
-    def getTrainCameras(self, scale=1.0):
-        return self.train_cameras[scale]
+    def getTrainCameras(self, scale=1.0, render_num_images=-1):
+        if render_num_images == -1:
+            return self.train_cameras[scale]
+        else:
+            cameras = self.train_cameras[scale]
+            return cameras[:render_num_images]
 
-    def getTestCameras(self, scale=1.0):
-        return self.test_cameras[scale]
+    def getTestCameras(self, scale=1.0, render_num_images=-1):
+        if render_num_images == -1:
+            return self.test_cameras[scale]
+        else:
+            cameras = self.test_cameras[scale]
+            return cameras[:render_num_images]
