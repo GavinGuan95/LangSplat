@@ -28,11 +28,11 @@ import json
 def render_set(model_path, source_path, name, iteration, views, gaussians, pipeline, background, args):
     render_path = os.path.join(model_path, name, "ours_{}".format(iteration), "renders")
     gts_path = os.path.join(model_path, name, "ours_{}".format(iteration), "gt")
-    render_npy_path = os.path.join(model_path, name, "ours_{}".format(iteration), "renders_npy")
-    gts_npy_path = os.path.join(model_path, name, "ours_{}".format(iteration), "gt_npy")
+    render_pt_path = os.path.join(model_path, name, "ours_{}".format(iteration), "renders_pt")
+    gts_pt_path = os.path.join(model_path, name, "ours_{}".format(iteration), "gt_pt")
 
-    makedirs(render_npy_path, exist_ok=True)
-    makedirs(gts_npy_path, exist_ok=True)
+    makedirs(render_pt_path, exist_ok=True)
+    makedirs(gts_pt_path, exist_ok=True)
     makedirs(render_path, exist_ok=True)
     makedirs(gts_path, exist_ok=True)
 
@@ -58,9 +58,9 @@ def render_set(model_path, source_path, name, iteration, views, gaussians, pipel
         elif not args.ignore_gt:
             gt, mask = view.get_language_feature(os.path.join(source_path, args.language_features_name), feature_level=args.feature_level)
 
-        np.save(os.path.join(render_npy_path, '{0:05d}'.format(idx) + ".npy"),rendering.permute(1,2,0).cpu().numpy())
+        torch.save(rendering.permute(1,2,0), os.path.join(render_pt_path, '{0:05d}'.format(idx) + ".pt"))
         if not args.ignore_gt:
-            np.save(os.path.join(gts_npy_path, '{0:05d}'.format(idx) + ".npy"),gt.permute(1,2,0).cpu().numpy())
+            torch.save(gt.permute(1,2,0), os.path.join(gts_pt_path, '{0:05d}'.format(idx) + ".pt"))
         torchvision.utils.save_image(rendering, os.path.join(render_path, '{0:05d}'.format(idx) + ".png"))
         if not args.ignore_gt:
             torchvision.utils.save_image(gt, os.path.join(gts_path, '{0:05d}'.format(idx) + ".png"))
