@@ -23,6 +23,7 @@ from argparse import ArgumentParser
 from arguments import ModelParams, PipelineParams, get_combined_args
 from gaussian_renderer import GaussianModel
 from autoencoder.model import Autoencoder
+from scene.dataset_readers import sceneLoadTypeCallbacks
 import json
 
 def render_set(model_path, source_path, name, iteration, views, gaussians, pipeline, background, args):
@@ -58,13 +59,24 @@ def render_set(model_path, source_path, name, iteration, views, gaussians, pipel
         elif not args.ignore_gt:
             gt, mask = view.get_language_feature(os.path.join(source_path, args.language_features_name), feature_level=args.feature_level)
 
-        torch.save(rendering.permute(1,2,0), os.path.join(render_pt_path, '{0:05d}'.format(idx) + ".pt"))
+        # Save the permuted rendering tensor as a PyTorch file (.pt)
+        render_pt_file = os.path.join(render_pt_path, '{0:05d}'.format(idx) + ".pt")
+        torch.save(rendering.permute(1,2,0).cpu(), render_pt_file)
+
+        # Save the permuted gt tensor as a PyTorch file (.pt) if args.ignore_gt is False
         if not args.ignore_gt:
-            torch.save(gt.permute(1,2,0), os.path.join(gts_pt_path, '{0:05d}'.format(idx) + ".pt"))
-        torchvision.utils.save_image(rendering, os.path.join(render_path, '{0:05d}'.format(idx) + ".png"))
+            gts_pt_file = os.path.join(gts_pt_path, '{0:05d}'.format(idx) + ".pt")
+            torch.save(gt.permute(1,2,0).cpu(), gts_pt_file)
+
+        # Save the rendering tensor as an image file (.png)
+        render_png_file = os.path.join(render_path, '{0:05d}'.format(idx) + ".png")
+        torchvision.utils.save_image(rendering, render_png_file)
+
+        # Save the gt tensor as an image file (.png) if args.ignore_gt is False
         if not args.ignore_gt:
-            torchvision.utils.save_image(gt, os.path.join(gts_path, '{0:05d}'.format(idx) + ".png"))
-               
+            gts_png_file = os.path.join(gts_path, '{0:05d}'.format(idx) + ".png")
+            torchvision.utils.save_image(gt, gts_png_file)
+        
 def render_sets(dataset : ModelParams, iteration : int, pipeline : PipelineParams, skip_train : bool, skip_test : bool, args, render_num_images=-1):
     if not args.render_camera_path:
         with torch.no_grad():
@@ -93,6 +105,7 @@ def render_sets(dataset : ModelParams, iteration : int, pipeline : PipelineParam
 
             camera_path_json = json.load(open(args.camera_path_file))
             ns_cameras = get_path_from_json(camera_path_json)
+            # scene_info = sceneLoadTypeCallbacks["Blender"](args.camera_path_file, args.white_background, args.eval)
             views = ns_cameras_to_langsplat_cameras(ns_cameras)
             render_set(dataset.model_path, dataset.source_path, "camera_path", None, views, gaussians, pipeline, background, args)
 
