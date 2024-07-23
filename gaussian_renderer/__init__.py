@@ -47,7 +47,8 @@ def render(viewpoint_camera, pc : GaussianModel, pipe, bg_color : torch.Tensor, 
         campos=viewpoint_camera.camera_center,
         prefiltered=False,
         debug=pipe.debug,
-        include_feature=opt.include_feature,
+        # include_feature=opt.include_feature,
+        include_feature=True,
     )
 
     rasterizer = GaussianRasterizer(raster_settings=raster_settings)
@@ -88,7 +89,8 @@ def render(viewpoint_camera, pc : GaussianModel, pipe, bg_color : torch.Tensor, 
         language_feature_precomp = language_feature_precomp/ (language_feature_precomp.norm(dim=-1, keepdim=True) + 1e-9)
         # language_feature_precomp = torch.sigmoid(language_feature_precomp)
     else:
-        language_feature_precomp = torch.zeros((1,), dtype=opacity.dtype, device=opacity.device)
+        # language_feature_precomp = torch.zeros((1,), dtype=opacity.dtype, device=opacity.device)
+        language_feature_precomp = colors_precomp * 0.0
         
     # Rasterize visible Gaussians to image, obtain their radii (on screen). 
     # start_time = time.time()

@@ -204,6 +204,7 @@ class GaussianModel:
             if self._language_feature is None or self._language_feature.shape[0] != self._xyz.shape[0]:
                 # 开始feature训练的时候，往模型中加入language feature参数
                 language_feature = torch.zeros((self._xyz.shape[0], 3), device="cuda")
+                # language_feature = torch.zeros((self._xyz.shape[0], 4), device="cuda")
                 self._language_feature = nn.Parameter(language_feature.requires_grad_(True))
                 
             l = [
