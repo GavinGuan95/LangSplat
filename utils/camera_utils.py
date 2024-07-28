@@ -89,6 +89,9 @@ def ns_cameras_to_langsplat_cameras(ns_cameras_list):
         width = ns_camera.image_width
         height = ns_camera.image_height
         c2w = torch.cat((ns_camera.camera_to_worlds, torch.tensor([[0, 0, 0, 1]]).to(ns_camera.camera_to_worlds)), dim=0).to("cpu").numpy()
+
+        c2w[2, :] *= -1
+        c2w = c2w[np.array([0, 2, 1, 3]), :]
         c2w[:3, 1:3] *= -1
         w2c = np.linalg.inv(c2w)
         R = np.transpose(w2c[:3, :3])
