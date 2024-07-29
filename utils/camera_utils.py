@@ -12,8 +12,9 @@
 from scene.cameras import Camera
 import numpy as np
 from utils.general_utils import PILtoTorch
-from utils.graphics_utils import fov2focal
+from utils.graphics_utils import fov2focal, focal2fov2
 import torch
+from nerfstudio.cameras.camera_utils import auto_orient_and_center_poses
 
 WARNED = False
 
@@ -84,11 +85,20 @@ def camera_to_JSON(id, camera : Camera):
     return camera_entry
 
 def ns_cameras_to_langsplat_cameras(ns_cameras_list):
+    scale_factor = 1.0
+    poses = torch.cat([torch.cat((ns_camera.camera_to_worlds, torch.tensor([[0, 0, 0, 1]]).to(ns_camera.camera_to_worlds))).unsqueeze(0)
+                       for ns_camera in ns_cameras_list], dim=0)
+    scale_factor /= float(torch.max(torch.abs(poses[:, :3, 3])))
+    poses, _ = auto_orient_and_center_poses(poses, 'up', 'poses')
+
     langsplat_cameras = []
     for i, ns_camera in enumerate(ns_cameras_list):
         width = ns_camera.image_width
         height = ns_camera.image_height
-        c2w = torch.cat((ns_camera.camera_to_worlds, torch.tensor([[0, 0, 0, 1]]).to(ns_camera.camera_to_worlds)), dim=0).to("cpu").numpy()
+        c2w = torch.cat((poses[i], torch.tensor([[0, 0, 0, 1]]).to(ns_camera.camera_to_worlds)), dim=0).to("cpu").numpy()
+
+        # Scale factor applied in nerfstudio dataparser in nerfstudio implementation
+        c2w[:3, 3] *= scale_factor
 
         c2w[2, :] *= -1
         c2w = c2w[np.array([0, 2, 1, 3]), :]
@@ -96,8 +106,8 @@ def ns_cameras_to_langsplat_cameras(ns_cameras_list):
         w2c = np.linalg.inv(c2w)
         R = np.transpose(w2c[:3, :3])
         T = w2c[:3, 3]
-        FoVx = ns_camera.fx
-        FoVy = ns_camera.fy
+        FoVx = focal2fov2(ns_camera.fx, width) 
+        FoVy = focal2fov2(ns_camera.fy, height)
         colmap_id = i
         uid = i
         langsplat_cameras.append(Camera(colmap_id, R, T, FoVx, FoVy, None, None, f"frame_{i}", uid, width=width, height=height))

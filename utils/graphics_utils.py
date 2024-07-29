@@ -75,3 +75,15 @@ def fov2focal(fov, pixels):
 
 def focal2fov(focal, pixels):
     return 2*math.atan(pixels/(2*focal))
+
+
+def focal2fov2(focal_length: float, image_height: int):
+    """Returns the field of view of a three.js perspective camera.
+
+    Args:
+        focal_length: the focal length of the camera in pixels.
+        image_height: the height of the image in pixels.
+    """
+    pp_h = image_height / 2.0
+    fov = 2.0 * np.arctan(pp_h / focal_length) #* (180.0 / np.pi)
+    return fov
