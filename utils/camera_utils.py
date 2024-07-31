@@ -88,8 +88,8 @@ def ns_cameras_to_langsplat_cameras(ns_cameras_list):
     scale_factor = 1.0
     poses = torch.cat([torch.cat((ns_camera.camera_to_worlds, torch.tensor([[0, 0, 0, 1]]).to(ns_camera.camera_to_worlds))).unsqueeze(0)
                        for ns_camera in ns_cameras_list], dim=0)
-    scale_factor /= float(torch.max(torch.abs(poses[:, :3, 3])))
-    poses, _ = auto_orient_and_center_poses(poses, 'up', 'poses')
+    #scale_factor /= float(torch.max(torch.abs(poses[:, :3, 3])))
+    #poses, _ = auto_orient_and_center_poses(poses, 'up', 'poses')
 
     langsplat_cameras = []
     for i, ns_camera in enumerate(ns_cameras_list):
